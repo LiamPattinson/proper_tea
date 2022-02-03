@@ -6,9 +6,9 @@ import pytest
 def property_class():
     class MyClass:
 
-        pos_float = positive_float("pos_float")
-        pos_int = positive_int("pos_int")
-        ranged = in_range("ranged",(-1.0,1.0))
+        pos_float = positive_float()
+        pos_int = positive_int()
+        ranged = in_range((-1.0,1.0))
 
         def __init__(self):
             self.pos_float = 1.0
