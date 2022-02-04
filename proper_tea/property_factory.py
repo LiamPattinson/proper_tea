@@ -46,7 +46,7 @@ def property_factory(
 
     def getter(instance):
         """Retrieve the property from the given class instance."""
-        return getattr(instance,internal_name)
+        return getattr(instance, internal_name)
 
     def setter(instance, value):
         """Assign 'value' to the property within the given class instance."""
