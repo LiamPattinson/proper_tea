@@ -15,6 +15,7 @@ from .property_factory import property_factory
 from .constrained_numbers import (
     floating_point,
     integer,
+    boolean,
     positive,
     positive_int,
     positive_float,

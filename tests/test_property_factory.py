@@ -2,6 +2,7 @@ from proper_tea import property_factory
 
 import pytest
 
+
 @pytest.fixture
 def property_class():
     class MyClass:
@@ -27,6 +28,7 @@ def property_class():
 
     return MyClass()
 
+
 def test_property_factory_transform(property_class):
     # MyClass.ends_in_dot should always have '.' in the last place
     assert property_class.ends_in_dot[-1] == "."
@@ -42,6 +44,7 @@ def test_property_factory_transform(property_class):
     assert "raise" in str(execinfo.value)
     # Ensure that a failed set doesn't modify
     assert property_class.ends_in_dot == "hello world.."
+
 
 def test_property_factory_condition(property_class):
     # MyClass.equal_to_5 should fail when given anything except 5

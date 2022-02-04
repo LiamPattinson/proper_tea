@@ -128,6 +128,11 @@ def integer():
     return property_factory(**_convert_args(int))
 
 
+def boolean():
+    """Creates property that transforms to bool"""
+    return property_factory(**_convert_args(bool))
+
+
 def positive(allow_zero: bool = True, type_constraint=None):
     """Creates property that must be positive, possibly including zero
 
