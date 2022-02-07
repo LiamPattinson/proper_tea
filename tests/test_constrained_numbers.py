@@ -1,5 +1,6 @@
 import proper_tea as pt
 import pytest
+from itertools import product
 
 
 @pytest.fixture
@@ -289,7 +290,6 @@ def gt_lt_test(limit: float, inclusive: bool):
 
         def __init__(self):
             self.limit = limit
-            self.int_limit = int(limit)
             self.inclusive = inclusive
 
     return MyClass()
@@ -511,34 +511,286 @@ class TestGtLt:
             gt_lt_test.lt_int = "hello world"
 
 
-"""
-def test_in_range(property_class):
-    # Ensure that the user can assign to a in_range
-    property_class.ranged = 0.5
-    assert property_class.ranged == 0.5
-    # The edge values should be allowed
-    property_class.ranged = 1.0
-    assert property_class.ranged == 1.0
-    property_class.ranged = -1.0
-    assert property_class.ranged == -1.0
-    # No type restrictions, should be able to set to int
-    property_class.ranged = 1
-    assert property_class.ranged == 1
-    assert isinstance( property_class.ranged, int)
-    # Ensure that the user cannot set to something larger than upper bound
-    with pytest.raises(ValueError) as excinfo:
-        property_class.ranged = 1.5
-    assert "False" in str(excinfo.value)
-    # Ensure that the user cannot set to something smaller than lower bound
-    with pytest.raises(ValueError) as excinfo:
-        property_class.ranged = -1.1
-    assert "False" in str(excinfo.value)
-    # Ensure the value is unchanged by a failed assignment
-    assert property_class.ranged == 1
-    # Ensure that the user cannot set to something that can't be compared
-    with pytest.raises(ValueError) as excinfo:
-        property_class.ranged = "hello world"
-    assert "raise" in str(excinfo.value)
-    # Ensure the value is unchanged by a failed assignment
-    assert property_class.ranged == 1
-"""
+@pytest.fixture
+def ranged_test(bounds: (float, float), inclusive: (bool, bool)):
+    class MyClass:
+
+        in_range = pt.in_range(bounds=bounds, inclusive=inclusive)
+        float_in_range = pt.float_in_range(bounds=bounds, inclusive=inclusive)
+        int_in_range = pt.int_in_range(bounds=bounds, inclusive=inclusive)
+        not_in_range = pt.not_in_range(bounds=bounds, inclusive=inclusive)
+        float_not_in_range = pt.float_not_in_range(bounds=bounds, inclusive=inclusive)
+        int_not_in_range = pt.int_not_in_range(bounds=bounds, inclusive=inclusive)
+
+        def __init__(self):
+            self.bounds = bounds
+            self.inclusive = inclusive
+            if isinstance(inclusive, bool):
+                self.inclusive = (inclusive, inclusive)
+
+    return MyClass()
+
+
+def get_ranged_params():
+    return product(
+        product((-2.2, -2), (+2.2, +2)),
+        [*product((False, True), (False, True)), False, True],
+    )
+
+
+class TestRanged:
+    @pytest.mark.parametrize("bounds, inclusive", get_ranged_params())
+    def test_in_range(self, ranged_test):
+        bounds = ranged_test.bounds
+        inclusive = ranged_test.inclusive
+        # Ensure the user can assign number within bounds
+        ranged_test.in_range = 0.5 * sum(bounds)
+        assert ranged_test.in_range == 0.5 * sum(bounds)
+        assert isinstance(ranged_test.in_range, float)
+        ranged_test.in_range = int(0.5 * sum(bounds))
+        assert ranged_test.in_range == int(0.5 * sum(bounds))
+        assert isinstance(ranged_test.in_range, int)
+        # Ensure anything outside fails
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.in_range = bounds[0] - 1
+        assert "range" in str(excinfo.value)
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.in_range = bounds[1] + 1
+        assert "range" in str(excinfo.value)
+        # Ensure limit works if inclusive is true
+        if ranged_test.inclusive[0]:
+            ranged_test.in_range = bounds[0]
+            assert ranged_test.in_range == bounds[0]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.in_range = bounds[0] - 1
+            assert "[" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.in_range = bounds[0]
+            assert "(" in str(excinfo.value)
+        if ranged_test.inclusive[1]:
+            ranged_test.in_range = bounds[1]
+            assert ranged_test.in_range == bounds[1]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.in_range = bounds[1] + 1
+            assert "]" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.in_range = bounds[1]
+            assert ")" in str(excinfo.value)
+        # Ensure it won't allow non-numbers
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.in_range = "hello world"
+
+    @pytest.mark.parametrize("bounds, inclusive", get_ranged_params())
+    def test_float_in_range(self, ranged_test):
+        bounds = ranged_test.bounds
+        inclusive = ranged_test.inclusive
+        # Ensure the user can assign number within bounds
+        ranged_test.float_in_range = 0.5 * sum(bounds)
+        assert ranged_test.float_in_range == 0.5 * sum(bounds)
+        assert isinstance(ranged_test.float_in_range, float)
+        ranged_test.float_in_range = int(0.5 * sum(bounds))
+        assert ranged_test.float_in_range == int(0.5 * sum(bounds))
+        assert isinstance(ranged_test.float_in_range, float)
+        # Ensure anything outside fails
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.float_in_range = bounds[0] - 1
+        assert "range" in str(excinfo.value)
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.float_in_range = bounds[1] + 1
+        # Ensure limit works if inclusive is true
+        if ranged_test.inclusive[0]:
+            ranged_test.float_in_range = bounds[0]
+            assert ranged_test.float_in_range == bounds[0]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_in_range = bounds[0] - 1
+            assert "[" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_in_range = bounds[0]
+            assert "(" in str(excinfo.value)
+        if ranged_test.inclusive[1]:
+            ranged_test.float_in_range = bounds[1]
+            assert ranged_test.float_in_range == bounds[1]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_in_range = bounds[1] + 1
+            assert "]" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_in_range = bounds[1]
+            assert ")" in str(excinfo.value)
+        # Ensure it won't allow non-numbers
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.float_in_range = "hello world"
+
+    @pytest.mark.parametrize("bounds, inclusive", get_ranged_params())
+    def test_int_in_range(self, ranged_test):
+        bounds = ranged_test.bounds
+        inclusive = ranged_test.inclusive
+        # Ensure the user can assign number within bounds
+        ranged_test.int_in_range = 0.5 * sum(bounds)
+        assert ranged_test.int_in_range == int(0.5 * sum(bounds))
+        assert isinstance(ranged_test.int_in_range, int)
+        # Ensure anything outside fails
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.int_in_range = bounds[0] - 1
+        assert "range" in str(excinfo.value)
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.int_in_range = bounds[1] + 1
+        # Ensure limit works if inclusive is true
+        if ranged_test.inclusive[0]:
+            ranged_test.int_in_range = bounds[0]
+            assert ranged_test.int_in_range == int(bounds[0])
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_in_range = bounds[0] - 1
+            assert "[" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_in_range = bounds[0]
+            assert "(" in str(excinfo.value)
+        if ranged_test.inclusive[1]:
+            ranged_test.int_in_range = bounds[1]
+            assert ranged_test.int_in_range == int(bounds[1])
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_in_range = bounds[1] + 1
+            assert "]" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_in_range = bounds[1]
+            assert ")" in str(excinfo.value)
+        # Ensure it won't allow non-numbers
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.int_in_range = "hello world"
+
+    @pytest.mark.parametrize("bounds, inclusive", get_ranged_params())
+    def test_not_in_range(self, ranged_test):
+        bounds = ranged_test.bounds
+        inclusive = ranged_test.inclusive
+        # Ensure the user can assign number outside bounds
+        ranged_test.not_in_range = bounds[0] - 1.1
+        assert ranged_test.not_in_range == bounds[0] - 1.1
+        assert isinstance(ranged_test.not_in_range, float)
+        ranged_test.not_in_range = bounds[1] + 1.1
+        assert ranged_test.not_in_range == bounds[1] + 1.1
+        assert isinstance(ranged_test.not_in_range, float)
+        ranged_test.not_in_range = int(bounds[0]) - 1
+        assert ranged_test.not_in_range == int(bounds[0]) - 1
+        assert isinstance(ranged_test.not_in_range, int)
+        ranged_test.not_in_range = int(bounds[1]) + 1
+        assert ranged_test.not_in_range == int(bounds[1]) + 1
+        assert isinstance(ranged_test.not_in_range, int)
+        # Ensure anything inside fails
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.not_in_range = 0.5 * sum(bounds)
+        assert "range" in str(excinfo.value)
+        # Ensure limit works if inclusive is true
+        if ranged_test.inclusive[0]:
+            ranged_test.not_in_range = bounds[0]
+            assert ranged_test.not_in_range == bounds[0]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.not_in_range = bounds[0] + 1
+            assert "[" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.not_in_range = bounds[0]
+            assert "(" in str(excinfo.value)
+        if ranged_test.inclusive[1]:
+            ranged_test.not_in_range = bounds[1]
+            assert ranged_test.not_in_range == bounds[1]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.not_in_range = bounds[1] - 1
+            assert "]" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.not_in_range = bounds[1]
+            assert ")" in str(excinfo.value)
+        # Ensure it won't allow non-numbers
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.not_in_range = "hello world"
+
+    @pytest.mark.parametrize("bounds, inclusive", get_ranged_params())
+    def test_float_not_in_range(self, ranged_test):
+        bounds = ranged_test.bounds
+        inclusive = ranged_test.inclusive
+        # Ensure the user can assign number outside bounds
+        ranged_test.float_not_in_range = bounds[0] - 1.1
+        assert ranged_test.float_not_in_range == bounds[0] - 1.1
+        assert isinstance(ranged_test.float_not_in_range, float)
+        ranged_test.float_not_in_range = bounds[1] + 1.1
+        assert ranged_test.float_not_in_range == bounds[1] + 1.1
+        assert isinstance(ranged_test.float_not_in_range, float)
+        ranged_test.float_not_in_range = int(bounds[0]) - 1
+        assert ranged_test.float_not_in_range == int(bounds[0]) - 1
+        assert isinstance(ranged_test.float_not_in_range, float)
+        ranged_test.float_not_in_range = int(bounds[1]) + 1
+        assert ranged_test.float_not_in_range == int(bounds[1]) + 1
+        assert isinstance(ranged_test.float_not_in_range, float)
+        # Ensure anything inside fails
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.float_not_in_range = 0.5 * sum(bounds)
+        assert "range" in str(excinfo.value)
+        # Ensure limit works if inclusive is true
+        if ranged_test.inclusive[0]:
+            ranged_test.float_not_in_range = bounds[0]
+            assert ranged_test.float_not_in_range == bounds[0]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_not_in_range = bounds[0] + 1
+            assert "[" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_not_in_range = bounds[0]
+            assert "(" in str(excinfo.value)
+        if ranged_test.inclusive[1]:
+            ranged_test.float_not_in_range = bounds[1]
+            assert ranged_test.float_not_in_range == bounds[1]
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_not_in_range = bounds[1] - 1
+            assert "]" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.float_not_in_range = bounds[1]
+            assert ")" in str(excinfo.value)
+        # Ensure it won't allow non-numbers
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.float_not_in_range = "hello world"
+
+    @pytest.mark.parametrize("bounds, inclusive", get_ranged_params())
+    def test_int_not_in_range(self, ranged_test):
+        bounds = ranged_test.bounds
+        inclusive = ranged_test.inclusive
+        # Ensure the user can assign number outside bounds
+        ranged_test.int_not_in_range = bounds[0] - 1.1
+        assert ranged_test.int_not_in_range == int(bounds[0] - 1.1)
+        assert isinstance(ranged_test.int_not_in_range, int)
+        ranged_test.int_not_in_range = bounds[1] + 1.1
+        assert ranged_test.int_not_in_range == int(bounds[1] + 1.1)
+        assert isinstance(ranged_test.int_not_in_range, int)
+        # Ensure anything inside fails
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.int_not_in_range = 0.5 * sum(bounds)
+        assert "range" in str(excinfo.value)
+        # Ensure limit works if inclusive is true
+        if ranged_test.inclusive[0]:
+            ranged_test.int_not_in_range = bounds[0]
+            assert ranged_test.int_not_in_range == int(bounds[0])
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_not_in_range = bounds[0] + 1
+            assert "[" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_not_in_range = bounds[0]
+            assert "(" in str(excinfo.value)
+        if ranged_test.inclusive[1]:
+            ranged_test.int_not_in_range = bounds[1]
+            assert ranged_test.int_not_in_range == int(bounds[1])
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_not_in_range = bounds[1] - 1
+            assert "]" in str(excinfo.value)
+        else:
+            with pytest.raises(ValueError) as excinfo:
+                ranged_test.int_not_in_range = bounds[1]
+            assert ")" in str(excinfo.value)
+        # Ensure it won't allow non-numbers
+        with pytest.raises(ValueError) as excinfo:
+            ranged_test.int_not_in_range = "hello world"

@@ -72,16 +72,19 @@ def _test_bounds(bounds):
 
 
 def _ranged_inclusive_as_tuple(inclusive):
+    ranged_err = (
+        "When specifying if a range is inclusive, users should supply "
+        "either a single bool or an subscriptable object with len()==2"
+    )
+    if isinstance(inclusive, bool):
+        inclusive = (inclusive, inclusive)
     try:
         if len(inclusive) != 2:
-            raise ValueError(
-                "When specifying if a range is inclusive, users should supply "
-                "either a single bool or an subscriptable object with len()==2"
-            )
+            raise ValueError(ranged_err)
         inclusive[0]
         inclusive[1]
-    except TypeError:
-        return (inclusive, inclusive)
+    except TypeError as e:
+        raise TypeError(ranged_err) from e
     return tuple(inclusive)
 
 
