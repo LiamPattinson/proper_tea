@@ -6,7 +6,7 @@ A Python package for automating the creation of common class properties.
 
 Properties are a useful feature of modern Python, allowing users to cleanly add 'getter' and 'setter' functions in an unobtrusive manner. For example, a common use case is to ensure a class attribute cannot be set to a negative number:
 
-```
+```python
 class Item:
 
     def __init__(self,weight):
@@ -38,7 +38,7 @@ A downside of properties is that they require a significant amount of boilerplat
 
 `proper_tea` makes use of 'property factories', inspired by the book Fluent Python (Luciano Ramalho, O'Reilly, 2015), to automate the creation of common properties. Using `proper_tea`, the above class may instead be written:
 
-```
+```python
 import proper_tea as pt
 
 class Item:
@@ -51,7 +51,7 @@ class Item:
 
 Extending it to include other variables couldn't be easier:
 
-```
+```python
 import proper_tea as pt
 
 class Item:
@@ -93,7 +93,7 @@ pytest tests
 
 `proper_tea` provides property factories for NumPy arrays:
 
-```
+```python
 import numpy as np
 import proper_tea as pt
 import proper_tea.numpy
