@@ -35,3 +35,4 @@ from .constrained_numbers import (
     int_not_in_range,
     float_not_in_range,
 )
+from .discrete_sets import in_set
