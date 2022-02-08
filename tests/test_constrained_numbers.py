@@ -28,7 +28,7 @@ class TestBasics:
             basic_test.floating_point = "hello world"
         assert "convert" in str(excinfo.value)
 
-    def test_integer(self, basic_test):
+    def test_boolean(self, basic_test):
         # Ensure the user can assign
         basic_test.boolean = True
         assert basic_test.boolean
@@ -39,19 +39,19 @@ class TestBasics:
         # Anything should work, in theory
         basic_test.boolean = 60.5
         assert basic_test.boolean
-        assert isinstance(basic_test.integer, bool)
+        assert isinstance(basic_test.boolean, bool)
         basic_test.boolean = 0.0
         assert not basic_test.boolean
-        assert isinstance(basic_test.integer, bool)
+        assert isinstance(basic_test.boolean, bool)
         basic_test.boolean = "hello world"
         assert basic_test.boolean
-        assert isinstance(basic_test.integer, bool)
+        assert isinstance(basic_test.boolean, bool)
         basic_test.boolean = []
         assert not basic_test.boolean
-        assert isinstance(basic_test.integer, bool)
+        assert isinstance(basic_test.boolean, bool)
         basic_test.boolean = None
         assert not basic_test.boolean
-        assert isinstance(basic_test.integer, bool)
+        assert isinstance(basic_test.boolean, bool)
 
     def test_integer(self, basic_test):
         # Ensure the user can assign
