@@ -134,6 +134,9 @@ def test_fixed_size_numpy_array_1D(numpy_array_test_class):
         test_class.array_1D = (3,)
     assert "shape" in str(excinfo.value)
     with pytest.raises(ValueError) as excinfo:
+        test_class.array_1D = 5
+    assert "shape" in str(excinfo.value)
+    with pytest.raises(ValueError) as excinfo:
         test_class.array_1D = np.linspace(1.0, 4.0, 4).reshape((2, 2))
     assert "shape" in str(excinfo.value)
     # should be unchanged after these attempts
@@ -157,6 +160,9 @@ def test_fixed_size_numpy_array_2D(numpy_array_test_class):
     assert "shape" in str(excinfo.value)
     with pytest.raises(ValueError) as excinfo:
         test_class.array_2D = (3,)
+    assert "shape" in str(excinfo.value)
+    with pytest.raises(ValueError) as excinfo:
+        test_class.array_2D = 5
     assert "shape" in str(excinfo.value)
     with pytest.raises(ValueError) as excinfo:
         test_class.array_2D = np.linspace(1.0, 4.0, 4).reshape((2, 2))
