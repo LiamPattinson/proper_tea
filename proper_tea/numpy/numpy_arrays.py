@@ -31,7 +31,11 @@ def numpy_array(shape=None, dtype=None, sort: bool = False):
     def condition(x):
         if shape is not None:
             # Ensure shape of x is same as that provided by user
-            return np.all(np.equal(np.shape(x), shape))
+            equal_shapes = np.all(np.equal(np.shape(x), shape))
+            # It is possible for equal_shapes to be true while
+            # np.shape(x) and shape have different lengths.
+            same_lens = len(np.shape(x)) == len(shape)
+            return equal_shapes and same_lens
         # If shape is None, don't perform checks
         return True
 
