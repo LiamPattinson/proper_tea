@@ -1,4 +1,4 @@
-name: Upload Python Package
+name: Publish Python Package
 
 on:
   release:
@@ -39,23 +39,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up python
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
 
-    - name: Set up conda
-      run: |
-        $CONDA/bin/conda activate
-        $CONDA/bin/conda install anaconda-client conda-build
-        $CONDA/bin/conda config --set anaconda_upload no
-
-    - name: Conda build
-      run: |
-        $CONDA/bin/conda build .
-
-    - name: Upload
-      run: |
-        anaconda upload $($CONDA/bin/conda build . --output)\
-          -t ${{ secrets.ANACONDA_TOKEN }}
-
+    - name: Publish to conda
+      uses: shimwell/conda-package-publish-action@main
+      with:
+        subDir: 'conda'
+        channels: '-c liampattinson'
+        AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
+        publish: true
+        test_all: true
+        convert_win: true
+        convert_osx: true
