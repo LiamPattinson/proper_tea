@@ -34,7 +34,7 @@ jobs:
 
   publish_conda:
 
-    runs-on: continuumio/miniconda3:4.10.3p1
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
