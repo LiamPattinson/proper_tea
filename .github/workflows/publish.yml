@@ -1,10 +1,3 @@
-# This yml file will trigger a Github Actions event that builds and upload the
-# Python package to PiPy. This makes use of Twine and is triggered when a push
-# to the main branch occures. For more information see:
-# https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-# and for details on the Autobump version section see:
-# https://github.com/grst/python-ci-versioneer
-
 name: Upload Python Package
 
 on:
@@ -62,6 +55,7 @@ jobs:
         conda build .
 
     - name: Upload
+      run: |
         anaconda upload $($CONDA/bin/conda build . --output)\
           -t ${{ secrets.ANACONDA_TOKEN }}
 
