@@ -45,12 +45,12 @@ jobs:
         python-version: 3.9
 
     - name: Set up conda
-      runs: |
+      run: |
           conda install -y anaconda-client conda-build
 
     - name: Publish to conda
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
-      runs: |
+      run: |
           conda build .
           anaconda upload --label main $(conda build . --output)
