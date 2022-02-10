@@ -1,0 +1,38 @@
+# jinja bits
+{% set version = environ.get("GIT_DESCRIBE_TAG", "0.0.0") %}
+{% set number = environ.get("GIT_DESCRIBE_NUMBER", 0) %} 
+
+package:
+  name: proper_tea
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  number: {{ number }}
+  script: python -m pip install . --no-deps --ignore-installed --no-cache-dir -vvv
+
+requirements:
+  host:
+    - python
+    - pip
+  run:
+    - python
+
+test:
+  requires:
+    - pytest
+    - numpy
+  source_files:
+    - tests/
+  commands:
+    - pytest tests -v
+
+about:
+  home: "https://github.com/LiamPattinson/proper_tea"
+  license: MIT
+  license_family: MIT
+  license_file: LICENSE.txt
+  summary: "A Python package for automating the creation of common class properties"
