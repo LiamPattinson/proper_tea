@@ -47,10 +47,10 @@ jobs:
     - name: Set up conda
       run: |
           conda install -y anaconda-client conda-build
+          conda config --set anaconda_upload yes
 
-    - name: Publish to conda
+    - name: Build and publish to conda
       env:
         ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
       run: |
           conda build .
-          anaconda upload --label main $(conda build . --output)
