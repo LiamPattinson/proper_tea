@@ -46,6 +46,7 @@ jobs:
 
     - name: Set up conda
       run: |
+        conda init bash
         conda activate
         conda install anaconda-client conda-build
         conda config --set anaconda_upload no
